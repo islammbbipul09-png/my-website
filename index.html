@@ -1,40 +1,76 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>আমার প্রথম ওয়েবসাইট</title>
+  <title>WinGo 30s Game History</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
-      padding: 50px;
-    }
-    h1 {
-      color: #2c3e50;
-    }
-    p {
-      color: #555;
-      font-size: 18px;
-    }
-    button {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin-top: 20px;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    button:hover {
-      background: #2980b9;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; }
+    h1 { background: gold; padding: 10px; border-radius: 8px; }
+    #countdown { font-size: 24px; font-weight: bold; color: red; margin: 10px 0; }
+    table { width: 90%; margin: auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: gold; }
   </style>
 </head>
 <body>
-  <h1>আসসালামু আলাইকুম 🌸</h1>
-  <p>এটা আমার প্রথম ওয়েবসাইট, বানানো হয়েছে শুধু মোবাইল দিয়ে!</p>
-  <button onclick="alert('ধন্যবাদ ভাই! আপনি বাটনে ক্লিক করেছেন 😊')">Click Me</button>
+  <h1>WinGo 30s Game History</h1>
+  <div id="countdown">30</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Number</th>
+        <th>Big/Small</th>
+        <th>Color</th>
+      </tr>
+    </thead>
+    <tbody id="history"></tbody>
+  </table>
+
+  <script>
+    const API_URL = "/api/history"; // Proxy API
+    const countdownEl = document.getElementById("countdown");
+    const historyEl = document.getElementById("history");
+    let countdown = 30;
+
+    // Countdown Timer
+    function startCountdown() {
+      setInterval(() => {
+        countdown--;
+        if (countdown <= 0) countdown = 30;
+        countdownEl.textContent = countdown;
+      }, 1000);
+    }
+
+    // Fetch Game History
+    async function fetchHistory() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        historyEl.innerHTML = "";
+        data.slice(0, 10).forEach(item => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${item.period}</td>
+            <td style="color:${item.color.toLowerCase()}">${item.number}</td>
+            <td>${item.bigSmall}</td>
+            <td style="color:${item.color.toLowerCase()}">${item.color}</td>
+          `;
+          historyEl.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Error fetching history:", err);
+      }
+    }
+
+    // Auto Refresh Data
+    setInterval(fetchHistory, 5000);
+
+    // Start
+    startCountdown();
+    fetchHistory();
+  </script>
 </body>
 </html>
